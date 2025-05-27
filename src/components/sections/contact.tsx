@@ -312,7 +312,7 @@ export function ContactSection() {
             className="text-center pt-8 border-t border-border"
           >
             <p className="text-muted-foreground">
-              © 2024 {PERSONAL_INFO.name}. Built with Next.js, TypeScript, and
+              © 2025 {PERSONAL_INFO.name}. Built with Next.js, TypeScript, and
               Tailwind CSS.
             </p>
           </motion.div>

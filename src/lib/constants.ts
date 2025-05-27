@@ -28,7 +28,15 @@ export const PERSONAL_INFO = {
   resumeFile: "/LuNguyenMinh-CV.pdf",
 
   // Experience
-  yearsOfExperience: "2+",
+  yearsOfExperience: (() => {
+    const startDate = new Date(2023, 1); // February 2023 (0-indexed month)
+    const currentDate = new Date();
+    const diffInMonths =
+      (currentDate.getFullYear() - startDate.getFullYear()) * 12 +
+      (currentDate.getMonth() - startDate.getMonth());
+    const years = Math.floor(diffInMonths / 12);
+    return `${years}+`;
+  })(),
   projectsCompleted: "3+",
   technologies: "6+",
   commitment: "100%",

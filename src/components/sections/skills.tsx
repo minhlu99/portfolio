@@ -22,13 +22,32 @@ import {
 } from "react-icons/si";
 import { useInView } from "react-intersection-observer";
 
+// Brand colors for technology icons
+const iconColors = {
+  javascript: "#F7DF1E",
+  typescript: "#3178C6",
+  react: "#61DAFB",
+  nextjs: "#000000",
+  redux: "#764ABC",
+  tailwind: "#06B6D4",
+  styledComponents: "#DB7093",
+  css: "#1572B6",
+  nestjs: "#E0234E",
+  prisma: "#2D3748",
+  mongodb: "#47A248",
+  postgresql: "#4169E1",
+  redis: "#DC382D",
+  graphql: "#E10098",
+  git: "#F05032",
+};
+
 const skillCategories = [
   {
     title: "Programming Languages",
     icon: Code,
     skills: [
-      { name: "JavaScript", icon: SiJavascript },
-      { name: "TypeScript", icon: SiTypescript },
+      { name: "JavaScript", icon: SiJavascript, color: iconColors.javascript },
+      { name: "TypeScript", icon: SiTypescript, color: iconColors.typescript },
       { name: "SQL", icon: Database },
     ],
   },
@@ -36,36 +55,40 @@ const skillCategories = [
     title: "Frontend Frameworks/Libraries",
     icon: Globe,
     skills: [
-      { name: "ReactJS", icon: SiReact },
-      { name: "NextJS", icon: SiNextdotjs },
-      { name: "Redux Toolkit/Zustand", icon: SiRedux },
+      { name: "ReactJS", icon: SiReact, color: iconColors.react },
+      { name: "NextJS", icon: SiNextdotjs, color: iconColors.nextjs },
+      { name: "Redux Toolkit/Zustand", icon: SiRedux, color: iconColors.redux },
     ],
   },
   {
     title: "Styling & UI/UX",
     icon: Palette,
     skills: [
-      { name: "Tailwind CSS", icon: SiTailwindcss },
-      { name: "Styled Components", icon: SiStyledcomponents },
-      { name: "CSS/SCSS", icon: SiCss3 },
+      { name: "Tailwind CSS", icon: SiTailwindcss, color: iconColors.tailwind },
+      {
+        name: "Styled Components",
+        icon: SiStyledcomponents,
+        color: iconColors.styledComponents,
+      },
+      { name: "CSS/SCSS", icon: SiCss3, color: iconColors.css },
     ],
   },
   {
     title: "Backend Frameworks/Libraries",
     icon: Server,
     skills: [
-      { name: "NestJS", icon: SiNestjs },
-      { name: "Prisma", icon: SiPrisma },
-      { name: "Mongoose", icon: SiMongodb },
+      { name: "NestJS", icon: SiNestjs, color: iconColors.nestjs },
+      { name: "Prisma", icon: SiPrisma, color: iconColors.prisma },
+      { name: "Mongoose", icon: SiMongodb, color: iconColors.mongodb },
     ],
   },
   {
     title: "Database",
     icon: Database,
     skills: [
-      { name: "PostgreSQL", icon: SiPostgresql },
-      { name: "MongoDB", icon: SiMongodb },
-      { name: "Redis", icon: SiRedis },
+      { name: "PostgreSQL", icon: SiPostgresql, color: iconColors.postgresql },
+      { name: "MongoDB", icon: SiMongodb, color: iconColors.mongodb },
+      { name: "Redis", icon: SiRedis, color: iconColors.redis },
     ],
   },
   {
@@ -73,8 +96,8 @@ const skillCategories = [
     icon: Wrench,
     skills: [
       { name: "RESTful APIs", icon: Globe },
-      { name: "GraphQL APIs", icon: SiGraphql },
-      { name: "Git", icon: SiGit },
+      { name: "GraphQL APIs", icon: SiGraphql, color: iconColors.graphql },
+      { name: "Git", icon: SiGit, color: iconColors.git },
     ],
   },
 ];
@@ -140,7 +163,7 @@ export function SkillsSection() {
                   {/* Category Header */}
                   <div className="flex items-center space-x-3 mb-6">
                     <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
-                      <IconComponent className="w-5 h-5 text-primary" />
+                      <IconComponent className="w-5 h-5" />
                     </div>
                     <h3 className="text-lg font-semibold text-foreground">
                       {category.title}
@@ -168,7 +191,12 @@ export function SkillsSection() {
                           whileHover={{ scale: 1.05 }}
                         >
                           <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
-                            <SkillIcon className="w-4 h-4 text-primary" />
+                            <SkillIcon
+                              className="w-4 h-4"
+                              style={{
+                                color: skill.color,
+                              }}
+                            />
                           </div>
                           <span className="text-xs font-medium text-foreground text-center leading-tight">
                             {skill.name}

@@ -1,0 +1,17 @@
+{
+  "version": 2,
+  "framework": "nextjs",
+  "buildCommand": "next build",
+  "installCommand": "npm install",
+  "outputDirectory": ".next",
+  "regions": ["iad1"],
+  "cleanUrls": true,
+  "env": {
+    "NEXT_PUBLIC_DEPLOYMENT_ENV": "vercel"
+  },
+  "build": {
+    "env": {
+      "NEXT_PUBLIC_DEPLOYMENT_ENV": "vercel"
+    }
+  }
+}

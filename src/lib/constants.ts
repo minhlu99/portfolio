@@ -1,3 +1,6 @@
+// Import environment utility functions
+import { getBaseUrl } from "./env";
+
 // Personal Information Constants
 export const PERSONAL_INFO = {
   // Basic Info
@@ -69,7 +72,8 @@ export const ROLES = [
 export const SITE_CONFIG = {
   title: `${PERSONAL_INFO.name} - ${PERSONAL_INFO.title}`,
   description: PERSONAL_INFO.summary,
-  url: "https://your-portfolio-url.com", // Update this with your actual domain
+  // Use our environment utility to determine the URL
+  url: getBaseUrl(),
   siteName: `${PERSONAL_INFO.name} Portfolio`,
   keywords: [
     "Full Stack Developer",

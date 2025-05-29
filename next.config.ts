@@ -1,40 +1,43 @@
 import type { NextConfig } from "next";
 
+/**
+ * Next.js configuration
+ * Handles deployment-specific settings for different environments
+ */
 const nextConfig: NextConfig = {
   // Make environment variables available in the browser
   env: {
-    NEXT_PUBLIC_DEPLOYMENT_ENV: process.env.VERCEL
-      ? "vercel"
-      : process.env.NODE_ENV === "production"
-      ? "github-pages"
-      : "development",
-    NEXT_PUBLIC_VERCEL_URL: process.env.VERCEL_URL || "",
+    NEXT_PUBLIC_DEPLOYMENT_ENV: process.env.NEXT_PUBLIC_DEPLOYMENT_ENV,
   },
-  // Default configuration for Vercel
-  ...(process.env.VERCEL
+
+  // Environment-specific configurations
+  ...(process.env.NEXT_PUBLIC_DEPLOYMENT_ENV === "vercel"
     ? {
-        // Vercel configuration - set to default settings
-        // Remove output: "standalone" since Vercel handles this
+        // Vercel-specific configuration
         images: {
-          // Allow Vercel to optimize images
-          unoptimized: false,
+          unoptimized: false, // Allow Vercel's image optimization
         },
-        // No basePath or assetPrefix needed for Vercel
         experimental: {
-          // Empty to ensure compatibility
-          serverComponentsExternalPackages: [],
+          serverComponentsExternalPackages: [], // Default compatibility setting
         },
       }
     : {
-        // GitHub Pages configuration
+        // GitHub Pages (or other non-Vercel) configuration
         output: "export",
         trailingSlash: true,
         images: {
-          unoptimized: true,
+          unoptimized: true, // No server-side image optimization available
         },
-        // GitHub Pages serves from a subdirectory
-        basePath: process.env.NODE_ENV === "production" ? "/portfolio" : "",
-        assetPrefix: process.env.NODE_ENV === "production" ? "/portfolio" : "",
+
+        // Set base path and asset prefix for GitHub Pages subdirectory
+        basePath:
+          process.env.NEXT_PUBLIC_DEPLOYMENT_ENV === "github-pages"
+            ? "/portfolio"
+            : "",
+        assetPrefix:
+          process.env.NEXT_PUBLIC_DEPLOYMENT_ENV === "github-pages"
+            ? "/portfolio"
+            : "",
       }),
 };
 

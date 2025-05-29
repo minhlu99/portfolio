@@ -3,6 +3,10 @@
 # To get started with Next.js see: https://nextjs.org/docs/getting-started
 #
 name: Deploy Next.js site to Pages
+# This is the environment variable that will be used to determine the deployment environment
+env:
+  NEXT_PUBLIC_DEPLOYMENT_ENV: github-pages
+  NEXT_PUBLIC_NODE_ENV: production
 
 on:
   # Runs on pushes targeting the default branch
@@ -29,8 +33,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      NEXT_PUBLIC_DEPLOYMENT_ENV: github-pages
-      NODE_ENV: github-pages
+      NEXT_PUBLIC_DEPLOYMENT_ENV: ${{ env.NEXT_PUBLIC_DEPLOYMENT_ENV }}
+      NODE_ENV: ${{ env.NEXT_PUBLIC_NODE_ENV }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4

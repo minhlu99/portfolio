@@ -28,7 +28,8 @@ export const PERSONAL_INFO = {
     "Dynamic fullstack developer with 2 years of experience building APIs and web applications, including RESTful APIs for e-commerce and GraphQL APIs for content management. Expertise in NextJS, NestJS, and databases, seeking innovative projects.",
 
   // Resume/CV
-  resumeFile: "/LuNguyenMinh-FS-CV.pdf",
+  resumeFile:
+    "https://drive.google.com/file/d/1yokY3EtRfc2GPhYKi7ax6qCRqyIt5mAL/view?usp=drive_link",
 
   // Experience
   yearsOfExperience: (() => {

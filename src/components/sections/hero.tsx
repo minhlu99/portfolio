@@ -120,7 +120,8 @@ export function HeroSection() {
 
             <motion.a
               href={PERSONAL_INFO.resumeFile}
-              download
+              target="_blank"
+              rel="noopener noreferrer"
               className="btn-secondary"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}

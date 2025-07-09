@@ -30,6 +30,12 @@ export function ContactSection() {
     "idle" | "success" | "error"
   >("idle");
 
+  // Check if we're on GitHub Pages or in a static environment
+  const isStaticEnvironment =
+    process.env.NEXT_PUBLIC_DEPLOYMENT_ENV === "github-pages" ||
+    (typeof window !== "undefined" &&
+      window.location.hostname.includes("github.io"));
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -37,50 +43,115 @@ export function ContactSection() {
     setFieldErrors({});
     setButtonStatus("idle");
 
+    // Basic client-side validation
+    const errors: Record<string, string> = {};
+    if (!formData.name.trim() || formData.name.trim().length < 2) {
+      errors.name = "Name must be at least 2 characters";
+    }
+    if (!formData.email.trim() || !/\S+@\S+\.\S+/.test(formData.email)) {
+      errors.email = "Please enter a valid email address";
+    }
+    if (!formData.subject.trim() || formData.subject.trim().length < 5) {
+      errors.subject = "Subject must be at least 5 characters";
+    }
+    if (!formData.message.trim() || formData.message.trim().length < 10) {
+      errors.message = "Message must be at least 10 characters";
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
+      setButtonStatus("error");
+      setIsSubmitting(false);
+      return;
+    }
+
     try {
-      const response = await fetch("/api/contact", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
+      if (isStaticEnvironment) {
+        // For GitHub Pages, use mailto as fallback
+        const mailtoBody = `Name: ${formData.name}%0D%0AEmail: ${formData.email}%0D%0A%0D%0AMessage:%0D%0A${formData.message}`;
+        const mailtoLink = `mailto:${PERSONAL_INFO.email}?subject=${encodeURIComponent(formData.subject)}&body=${mailtoBody}`;
 
-      const data = await response.json();
+        window.open(mailtoLink, "_blank");
 
-      if (!response.ok) {
-        // Handle validation errors with field-specific messages
-        if (data.error === "Validation failed" && data.details) {
-          const errors: Record<string, string> = {};
-          data.details.forEach((detail: { field: string; message: string }) => {
-            errors[detail.field] = detail.message;
-          });
-          setFieldErrors(errors);
-          setButtonStatus("error");
-        } else {
-          // Handle other errors
-          setSubmitStatus({
-            type: "error",
-            message: data.error || "Failed to send message",
-          });
-          setButtonStatus("error");
+        setSubmitStatus({
+          type: "success",
+          message:
+            "Your email client has been opened. Please send the email to complete your message.",
+        });
+        setButtonStatus("success");
+
+        // Reset form
+        setFormData({ name: "", email: "", subject: "", message: "" });
+        setFieldErrors({});
+
+        // Reset button status after animation
+        setTimeout(() => setButtonStatus("idle"), 3000);
+      } else {
+        // For environments with server support, use the API
+        const response = await fetch("/api/contact", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          // Handle validation errors with field-specific messages
+          if (data.error === "Validation failed" && data.details) {
+            const errors: Record<string, string> = {};
+            data.details.forEach(
+              (detail: { field: string; message: string }) => {
+                errors[detail.field] = detail.message;
+              }
+            );
+            setFieldErrors(errors);
+            setButtonStatus("error");
+          } else if (data.fallback === "mailto") {
+            // API suggests using mailto fallback
+            const mailtoBody = `Name: ${formData.name}%0D%0AEmail: ${formData.email}%0D%0A%0D%0AMessage:%0D%0A${formData.message}`;
+            const mailtoLink = `mailto:${PERSONAL_INFO.email}?subject=${encodeURIComponent(formData.subject)}&body=${mailtoBody}`;
+
+            window.open(mailtoLink, "_blank");
+
+            setSubmitStatus({
+              type: "success",
+              message:
+                "Your email client has been opened. Please send the email to complete your message.",
+            });
+            setButtonStatus("success");
+
+            // Reset form
+            setFormData({ name: "", email: "", subject: "", message: "" });
+            setFieldErrors({});
+            setTimeout(() => setButtonStatus("idle"), 3000);
+          } else {
+            // Handle other errors
+            setSubmitStatus({
+              type: "error",
+              message: data.error || "Failed to send message",
+            });
+            setButtonStatus("error");
+          }
+          return;
         }
-        return;
+
+        // Success
+        setSubmitStatus({
+          type: "success",
+          message: "Thank you for your message! I'll get back to you soon.",
+        });
+        setButtonStatus("success");
+
+        // Reset form
+        setFormData({ name: "", email: "", subject: "", message: "" });
+        setFieldErrors({});
+
+        // Reset button status after animation
+        setTimeout(() => setButtonStatus("idle"), 2000);
       }
-
-      // Success
-      setSubmitStatus({
-        type: "success",
-        message: "Thank you for your message! I'll get back to you soon.",
-      });
-      setButtonStatus("success");
-
-      // Reset form
-      setFormData({ name: "", email: "", subject: "", message: "" });
-      setFieldErrors({});
-
-      // Reset button status after animation
-      setTimeout(() => setButtonStatus("idle"), 2000);
     } catch (error) {
       console.error("Form submission error:", error);
       setSubmitStatus({
@@ -408,6 +479,27 @@ export function ContactSection() {
                   )}
                 </div>
 
+                {/* Form Instructions */}
+                {isStaticEnvironment && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="p-4 bg-blue-50 border border-blue-200 rounded-lg dark:bg-blue-900/20 dark:border-blue-800"
+                  >
+                    <div className="flex items-start space-x-2">
+                      <Mail className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
+                      <div className="text-sm text-blue-800 dark:text-blue-300">
+                        <p className="font-medium mb-1">Email Client Mode</p>
+                        <p>
+                          This form will open your email client with a
+                          pre-filled message. Simply send the email to complete
+                          your message.
+                        </p>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+
                 <motion.button
                   type="submit"
                   disabled={isSubmitting}
@@ -433,7 +525,11 @@ export function ContactSection() {
                   {isSubmitting ? (
                     <div className="flex items-center justify-center space-x-2">
                       <div className="w-4 h-4 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin"></div>
-                      <span>Sending...</span>
+                      <span>
+                        {isStaticEnvironment
+                          ? "Opening Email..."
+                          : "Sending..."}
+                      </span>
                     </div>
                   ) : buttonStatus === "success" ? (
                     <motion.div
@@ -443,7 +539,11 @@ export function ContactSection() {
                       transition={{ duration: 0.3 }}
                     >
                       <Check className="w-5 h-5" />
-                      <span>Message Sent!</span>
+                      <span>
+                        {isStaticEnvironment
+                          ? "Email Opened!"
+                          : "Message Sent!"}
+                      </span>
                     </motion.div>
                   ) : buttonStatus === "error" ? (
                     <motion.div
@@ -457,8 +557,17 @@ export function ContactSection() {
                     </motion.div>
                   ) : (
                     <div className="flex items-center justify-center space-x-2">
-                      <Send className="w-5 h-5" />
-                      <span>Send Message</span>
+                      {isStaticEnvironment ? (
+                        <>
+                          <Mail className="w-5 h-5" />
+                          <span>Open Email Client</span>
+                        </>
+                      ) : (
+                        <>
+                          <Send className="w-5 h-5" />
+                          <span>Send Message</span>
+                        </>
+                      )}
                     </div>
                   )}
                 </motion.button>

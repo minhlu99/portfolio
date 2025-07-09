@@ -3,7 +3,7 @@
 import { PERSONAL_INFO } from "@/lib/constants";
 import { GitHubLogoIcon, LinkedInLogoIcon } from "@radix-ui/react-icons";
 import { motion } from "framer-motion";
-import { Mail, MapPin, Phone, Send } from "lucide-react";
+import { Check, Mail, MapPin, Phone, Send, X } from "lucide-react";
 import { useState } from "react";
 import { useInView } from "react-intersection-observer";
 
@@ -21,29 +21,103 @@ export function ContactSection() {
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<{
+    type: "success" | "error" | null;
+    message: string;
+  }>({ type: null, message: "" });
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [buttonStatus, setButtonStatus] = useState<
+    "idle" | "success" | "error"
+  >("idle");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setSubmitStatus({ type: null, message: "" });
+    setFieldErrors({});
+    setButtonStatus("idle");
 
-    // Simulate form submission
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
 
-    // Reset form
-    setFormData({ name: "", email: "", subject: "", message: "" });
-    setIsSubmitting(false);
+      const data = await response.json();
 
-    // In a real application, you would send the data to your backend
-    alert("Thank you for your message! I'll get back to you soon.");
+      if (!response.ok) {
+        // Handle validation errors with field-specific messages
+        if (data.error === "Validation failed" && data.details) {
+          const errors: Record<string, string> = {};
+          data.details.forEach((detail: { field: string; message: string }) => {
+            errors[detail.field] = detail.message;
+          });
+          setFieldErrors(errors);
+          setButtonStatus("error");
+        } else {
+          // Handle other errors
+          setSubmitStatus({
+            type: "error",
+            message: data.error || "Failed to send message",
+          });
+          setButtonStatus("error");
+        }
+        return;
+      }
+
+      // Success
+      setSubmitStatus({
+        type: "success",
+        message: "Thank you for your message! I'll get back to you soon.",
+      });
+      setButtonStatus("success");
+
+      // Reset form
+      setFormData({ name: "", email: "", subject: "", message: "" });
+      setFieldErrors({});
+
+      // Reset button status after animation
+      setTimeout(() => setButtonStatus("idle"), 2000);
+    } catch (error) {
+      console.error("Form submission error:", error);
+      setSubmitStatus({
+        type: "error",
+        message:
+          error instanceof Error
+            ? error.message
+            : "Something went wrong. Please try again.",
+      });
+      setButtonStatus("error");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
+    const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [e.target.name]: e.target.value,
+      [name]: value,
     }));
+
+    // Clear field error when user starts typing
+    if (fieldErrors[name]) {
+      setFieldErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[name];
+        return newErrors;
+      });
+    }
+
+    // Reset button status when user starts editing
+    if (buttonStatus !== "idle") {
+      setButtonStatus("idle");
+    }
   };
 
   const containerVariants = {
@@ -206,6 +280,21 @@ export function ContactSection() {
               </h3>
 
               <form onSubmit={handleSubmit} className="space-y-6">
+                {/* Status Message */}
+                {submitStatus.type && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className={`p-4 rounded-lg border ${
+                      submitStatus.type === "success"
+                        ? "bg-green-50 border-green-200 text-green-800 dark:bg-green-900/20 dark:border-green-800 dark:text-green-300"
+                        : "bg-red-50 border-red-200 text-red-800 dark:bg-red-900/20 dark:border-red-800 dark:text-red-300"
+                    }`}
+                  >
+                    {submitStatus.message}
+                  </motion.div>
+                )}
+
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
                     <label
@@ -221,9 +310,18 @@ export function ContactSection() {
                       value={formData.name}
                       onChange={handleChange}
                       required
-                      className="w-full px-4 py-3 bg-background border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 text-foreground placeholder-muted-foreground"
+                      className={`w-full px-4 py-3 bg-background border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 text-foreground placeholder-muted-foreground ${
+                        fieldErrors.name
+                          ? "border-red-500 focus:ring-red-500"
+                          : "border-border"
+                      }`}
                       placeholder="John Doe"
                     />
+                    {fieldErrors.name && (
+                      <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                        {fieldErrors.name}
+                      </p>
+                    )}
                   </div>
                   <div>
                     <label
@@ -239,9 +337,18 @@ export function ContactSection() {
                       value={formData.email}
                       onChange={handleChange}
                       required
-                      className="w-full px-4 py-3 bg-background border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 text-foreground placeholder-muted-foreground"
+                      className={`w-full px-4 py-3 bg-background border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 text-foreground placeholder-muted-foreground ${
+                        fieldErrors.email
+                          ? "border-red-500 focus:ring-red-500"
+                          : "border-border"
+                      }`}
                       placeholder="john@example.com"
                     />
+                    {fieldErrors.email && (
+                      <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                        {fieldErrors.email}
+                      </p>
+                    )}
                   </div>
                 </div>
 
@@ -259,9 +366,18 @@ export function ContactSection() {
                     value={formData.subject}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-3 bg-background border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 text-foreground placeholder-muted-foreground"
+                    className={`w-full px-4 py-3 bg-background border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 text-foreground placeholder-muted-foreground ${
+                      fieldErrors.subject
+                        ? "border-red-500 focus:ring-red-500"
+                        : "border-border"
+                    }`}
                     placeholder="Project Collaboration"
                   />
+                  {fieldErrors.subject && (
+                    <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                      {fieldErrors.subject}
+                    </p>
+                  )}
                 </div>
 
                 <div>
@@ -278,23 +394,67 @@ export function ContactSection() {
                     onChange={handleChange}
                     required
                     rows={5}
-                    className="w-full px-4 py-3 bg-background border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 text-foreground placeholder-muted-foreground resize-none"
+                    className={`w-full px-4 py-3 bg-background border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 text-foreground placeholder-muted-foreground resize-none ${
+                      fieldErrors.message
+                        ? "border-red-500 focus:ring-red-500"
+                        : "border-border"
+                    }`}
                     placeholder={`Hi ${PERSONAL_INFO.firstName}, I'd like to discuss a project with you...`}
                   />
+                  {fieldErrors.message && (
+                    <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                      {fieldErrors.message}
+                    </p>
+                  )}
                 </div>
 
                 <motion.button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                  className={`w-full px-6 py-3 rounded-lg font-medium transition-all duration-300 relative overflow-hidden disabled:opacity-50 disabled:cursor-not-allowed ${
+                    buttonStatus === "success"
+                      ? "bg-green-600 hover:bg-green-700 text-white border border-green-600"
+                      : buttonStatus === "error"
+                        ? "bg-red-600 hover:bg-red-700 text-white border border-red-600"
+                        : isSubmitting
+                          ? "bg-primary hover:bg-primary text-primary-foreground border border-primary"
+                          : "btn-primary"
+                  }`}
                   whileHover={{ scale: isSubmitting ? 1 : 1.02 }}
                   whileTap={{ scale: isSubmitting ? 1 : 0.98 }}
+                  animate={{
+                    scale: buttonStatus === "success" ? [1, 1.05, 1] : 1,
+                  }}
+                  transition={{
+                    duration: buttonStatus === "success" ? 0.6 : 0.3,
+                    ease: "easeInOut",
+                  }}
                 >
                   {isSubmitting ? (
                     <div className="flex items-center justify-center space-x-2">
                       <div className="w-4 h-4 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin"></div>
                       <span>Sending...</span>
                     </div>
+                  ) : buttonStatus === "success" ? (
+                    <motion.div
+                      className="flex items-center justify-center space-x-2"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <Check className="w-5 h-5" />
+                      <span>Message Sent!</span>
+                    </motion.div>
+                  ) : buttonStatus === "error" ? (
+                    <motion.div
+                      className="flex items-center justify-center space-x-2"
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <X className="w-5 h-5" />
+                      <span>Failed to Send</span>
+                    </motion.div>
                   ) : (
                     <div className="flex items-center justify-center space-x-2">
                       <Send className="w-5 h-5" />

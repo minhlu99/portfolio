@@ -12,8 +12,9 @@ export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
     setMounted(true);
   }, []);
 
+  // Prevent hydration mismatch by returning a static version during SSR
   if (!mounted) {
-    return <>{children}</>;
+    return <div style={{ visibility: "hidden" }}>{children}</div>;
   }
 
   return <NextThemesProvider {...props}>{children}</NextThemesProvider>;

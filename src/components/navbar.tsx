@@ -1,5 +1,6 @@
 "use client";
 
+import { useThemeDetection } from "@/hooks/use-theme-detection";
 import { NAVIGATION, PERSONAL_INFO } from "@/lib/constants";
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -8,12 +9,12 @@ import {
   FileText,
   Mail,
   Menu,
+  Monitor,
   Moon,
   Sun,
   User,
   X,
 } from "lucide-react";
-import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 
 const navigationWithIcons = [
@@ -27,11 +28,10 @@ const navigationWithIcons = [
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const { theme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
+  const { isDark, isSystem, mounted, cycleTheme, resolvedTheme } =
+    useThemeDetection();
 
   useEffect(() => {
-    setMounted(true);
     const handleScroll = () => {
       setScrolled(window.scrollY > 50);
     };
@@ -45,6 +45,35 @@ export function Navbar() {
       element.scrollIntoView({ behavior: "smooth" });
       setIsOpen(false);
     }
+  };
+
+  // Get the appropriate icon based on current theme state
+  const getThemeIcon = () => {
+    if (!mounted) {
+      // Return a neutral icon during hydration
+      return <div className="w-5 h-5" />;
+    }
+
+    if (isSystem) {
+      return <Monitor className="w-5 h-5 text-secondary-foreground" />;
+    }
+
+    return isDark ? (
+      <Sun className="w-5 h-5 text-secondary-foreground" />
+    ) : (
+      <Moon className="w-5 h-5 text-secondary-foreground" />
+    );
+  };
+
+  // Get theme label for accessibility
+  const getThemeLabel = () => {
+    if (!mounted) return "Toggle theme";
+
+    if (isSystem) {
+      return `System theme (${resolvedTheme === "dark" ? "dark" : "light"})`;
+    }
+
+    return `Switch to ${isDark ? "light" : "dark"} theme`;
   };
 
   return (
@@ -95,21 +124,16 @@ export function Navbar() {
 
           {/* Theme Toggle & Mobile Menu */}
           <div className="flex items-center space-x-4">
-            {mounted && (
-              <motion.button
-                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                className="p-2 rounded-lg bg-secondary hover:bg-secondary/80 transition-colors duration-200"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                aria-label="Toggle theme"
-              >
-                {theme === "dark" ? (
-                  <Sun className="w-5 h-5 text-secondary-foreground" />
-                ) : (
-                  <Moon className="w-5 h-5 text-secondary-foreground" />
-                )}
-              </motion.button>
-            )}
+            <motion.button
+              onClick={cycleTheme}
+              className="p-2 rounded-lg bg-secondary hover:bg-secondary/80 transition-colors duration-200"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              aria-label={getThemeLabel()}
+              title={getThemeLabel()}
+            >
+              {getThemeIcon()}
+            </motion.button>
 
             {/* Mobile Menu Button */}
             <motion.button

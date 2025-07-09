@@ -29,7 +29,7 @@ export const PERSONAL_INFO = {
 
   // Resume/CV
   resumeFile:
-    "https://drive.google.com/file/d/1yokY3EtRfc2GPhYKi7ax6qCRqyIt5mAL/view?usp=drive_link",
+    "https://drive.google.com/file/d/1l_6_uCjA9cQSp4EmFBVYtWhUDFLiiUzz/view?usp=sharing",
 
   // Experience
   yearsOfExperience: (() => {
@@ -77,20 +77,76 @@ export const SITE_CONFIG = {
   url: getBaseUrl(),
   siteName: `${PERSONAL_INFO.name} Portfolio`,
   keywords: [
+    // Core Developer Roles
     "Full Stack Developer",
     "Backend Developer",
     "Frontend Developer",
     "ReactJS Developer",
     "NextJS Developer",
+    "TypeScript Developer",
+    "Node.js Developer",
+
+    // Programming Languages
+    "TypeScript",
+    "JavaScript",
+
+    // Frontend Technologies
     "ReactJS",
     "NextJS",
-    "TypeScript",
+    "React Hook Form",
+    "Zustand",
+    "TanStack Query",
+    "Zod",
+
+    // Backend Technologies
     "Node.js",
-    "MongoDB",
-    "Portfolio",
+    "Express.js",
     "NestJS",
-    "GraphQL",
+    "Apollo Server",
+    "class-validator",
+    "class-transformer",
+
+    // API & Authentication
     "RESTful APIs",
+    "GraphQL",
+    "JWT",
+    "Passport",
+    "Swagger",
+
+    // Databases & ORMs
+    "MongoDB",
+    "PostgreSQL",
+    "MySQL",
+    "Prisma",
+    "Mongoose",
+
+    // Performance & Caching
+    "Redis",
+    "Rate Limiting",
+
+    // Testing
+    "Jest",
+    "Vitest",
+
+    // Styling & UI
+    "Tailwind CSS",
+    "Styled Components",
+    "Framer Motion",
+    "Responsive Design",
+    "HTML5",
+    "CSS3",
+    "SASS",
+
+    // Developer Tools
+    "Git",
+    "ESLint",
+    "Prettier",
+    "Husky",
+
+    // General
+    "Portfolio",
+    "Ho Chi Minh City",
+    "Vietnam",
   ],
 };
 
@@ -103,16 +159,53 @@ export const NAVIGATION = [
   { name: "Contact", href: "#contact" },
 ] as const;
 
-// Additional Skills
+// Additional Skills - Complementary technologies and methodologies
 export const ADDITIONAL_SKILLS = [
-  "Node.js",
-  "Express.js",
-  "Apollo Server",
-  "Discord API",
-  "Telegram API",
+  // State Management & Data Fetching
+  "Zustand",
+  "TanStack Query",
+  "React Hook Form",
+
+  // Validation & Type Safety
+  "Zod",
+  "class-validator",
+  "class-transformer",
+
+  // Authentication & Security
+  "Passport",
   "JWT Authentication",
-  "Responsive Design",
-  "Material UI",
+
+  // API Documentation & Testing
+  "Swagger",
+  "Postman",
+
+  // Performance & Caching
+  "Redis",
+  "Rate Limiting",
+
+  // Animation & UI Enhancement
+  "Framer Motion",
+  "Styled Components",
+
+  // Code Quality & Development
+  "ESLint",
+  "Prettier",
+  "Husky",
+  "Git Workflows",
+
+  // Testing Frameworks
+  "Jest",
+  "Vitest",
+  "React Testing Library",
+
+  // Architecture & Methodologies
+  "Clean Architecture",
+  "SOLID Principles",
   "Agile Methodologies",
+  "CI/CD",
+
+  // Cloud & Deployment
+  "Vercel",
   "AWS",
+  "Docker",
 ] as const;

@@ -2,8 +2,15 @@ import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import { z } from "zod";
 
-// Initialize Resend with your API key
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Only initialize Resend if we have the API key and we're not in a static build
+const isStaticBuild = process.env.NEXT_PUBLIC_DEPLOYMENT_ENV === "github-pages";
+const hasResendKey = process.env.RESEND_API_KEY;
+
+let resend: Resend | null = null;
+
+if (!isStaticBuild && hasResendKey) {
+  resend = new Resend(process.env.RESEND_API_KEY);
+}
 
 // Validation schema for contact form
 const contactFormSchema = z.object({
@@ -17,6 +24,18 @@ const contactFormSchema = z.object({
 });
 
 export async function POST(request: NextRequest) {
+  // If this is a static build or we don't have Resend configured, return an error
+  if (isStaticBuild || !resend) {
+    return NextResponse.json(
+      {
+        error:
+          "Contact form is not available in this environment. Please use the email link instead.",
+        fallback: "mailto",
+      },
+      { status: 503 }
+    );
+  }
+
   try {
     const body = await request.json();
 

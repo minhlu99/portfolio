@@ -67,17 +67,28 @@ export function ContactSection() {
 
     try {
       if (isStaticEnvironment) {
-        // For GitHub Pages, use mailto as fallback
+        // For static environments, open email client with pre-filled content
         const mailtoBody = `Name: ${formData.name}%0D%0AEmail: ${formData.email}%0D%0A%0D%0AMessage:%0D%0A${formData.message}`;
         const mailtoLink = `mailto:${PERSONAL_INFO.email}?subject=${encodeURIComponent(formData.subject)}&body=${mailtoBody}`;
 
-        window.open(mailtoLink, "_blank");
+        // Try to open email client
+        const emailWindow = window.open(mailtoLink, "_blank");
 
-        setSubmitStatus({
-          type: "success",
-          message:
-            "Your email client has been opened. Please send the email to complete your message.",
-        });
+        // Check if the email client opened successfully
+        if (emailWindow) {
+          setSubmitStatus({
+            type: "success",
+            message:
+              "Your email client has been opened with a pre-filled message. Please send the email to complete your message.",
+          });
+        } else {
+          // Fallback if popup was blocked
+          setSubmitStatus({
+            type: "success",
+            message: `Your browser blocked the email client. Please email me directly at ${PERSONAL_INFO.email} with your message.`,
+          });
+        }
+
         setButtonStatus("success");
 
         // Reset form
@@ -491,9 +502,9 @@ export function ContactSection() {
                       <div className="text-sm text-blue-800 dark:text-blue-300">
                         <p className="font-medium mb-1">Email Client Mode</p>
                         <p>
-                          This form will open your email client with a
-                          pre-filled message. Simply send the email to complete
-                          your message.
+                          Submitting this form will open your default email
+                          client with a pre-filled message. Simply send the
+                          email to complete your message.
                         </p>
                       </div>
                     </div>

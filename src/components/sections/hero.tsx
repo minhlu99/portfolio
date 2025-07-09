@@ -1,5 +1,15 @@
 "use client";
 
+import {
+  FloatingShape,
+  GridBackground,
+  HolographicShimmer,
+  LightRay,
+  MorphingBlob,
+  NeuralParticle,
+  Particle,
+  type FloatingShapeProps,
+} from "@/components/background";
 import { PERSONAL_INFO, ROLES } from "@/lib/constants";
 import { GitHubLogoIcon, LinkedInLogoIcon } from "@radix-ui/react-icons";
 import { motion } from "framer-motion";
@@ -9,6 +19,11 @@ import { useEffect, useState } from "react";
 export function HeroSection() {
   const [currentRole, setCurrentRole] = useState(0);
   const [mounted, setMounted] = useState(false);
+  const [neuralParticles] = useState(() =>
+    Array(20)
+      .fill(null)
+      .map(() => ({ x: 0, y: 0 }))
+  );
 
   useEffect(() => {
     setMounted(true);
@@ -30,15 +45,199 @@ export function HeroSection() {
     }
   };
 
+  // Generate enhanced floating shapes data
+  const floatingShapes: Omit<FloatingShapeProps, "key">[] = [
+    {
+      shape: "dodecahedron",
+      size: 20,
+      color: "bg-primary/20",
+      initialX: 100,
+      initialY: 200,
+      duration: 25,
+      delay: 0,
+      orbitRadius: 150,
+      orbitDuration: 20,
+    },
+    {
+      shape: "icosahedron",
+      size: 16,
+      color: "bg-blue-500/20",
+      initialX: 800,
+      initialY: 150,
+      duration: 30,
+      delay: 2,
+      orbitRadius: 120,
+      orbitDuration: 18,
+    },
+    {
+      shape: "sphere",
+      size: 18,
+      color: "bg-purple-500/20",
+      initialX: 200,
+      initialY: 600,
+      duration: 22,
+      delay: 4,
+      orbitRadius: 100,
+      orbitDuration: 15,
+    },
+    {
+      shape: "hexagon",
+      size: 14,
+      color: "bg-green-500/20",
+      initialX: 700,
+      initialY: 500,
+      duration: 28,
+      delay: 1,
+      orbitRadius: 130,
+      orbitDuration: 22,
+    },
+    {
+      shape: "cube",
+      size: 12,
+      color: "bg-orange-500/20",
+      initialX: 300,
+      initialY: 100,
+      duration: 32,
+      delay: 3,
+      orbitRadius: 90,
+      orbitDuration: 16,
+    },
+    {
+      shape: "triangle",
+      size: 22,
+      color: "bg-pink-500/20",
+      initialX: 600,
+      initialY: 400,
+      duration: 20,
+      delay: 5,
+      orbitRadius: 140,
+      orbitDuration: 24,
+    },
+    {
+      shape: "dodecahedron",
+      size: 15,
+      color: "bg-cyan-500/20",
+      initialX: 400,
+      initialY: 300,
+      duration: 26,
+      delay: 7,
+      orbitRadius: 110,
+      orbitDuration: 19,
+    },
+    {
+      shape: "icosahedron",
+      size: 19,
+      color: "bg-indigo-500/20",
+      initialX: 150,
+      initialY: 450,
+      duration: 24,
+      delay: 6,
+      orbitRadius: 160,
+      orbitDuration: 21,
+    },
+  ];
+
   return (
     <section className="min-h-screen flex items-center justify-center relative overflow-hidden">
-      {/* Background Elements */}
+      {/* Ultra-Enhanced Background Elements */}
       <div className="absolute inset-0 -z-10">
-        <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-primary/10 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl"></div>
+        {/* Holographic Shimmer Effect */}
+        <HolographicShimmer />
+
+        {/* Animated Gradient Mesh */}
+        <motion.div
+          className="absolute inset-0"
+          style={{
+            background: `
+              radial-gradient(circle at 20% 30%, rgba(var(--primary), 0.2) 0%, transparent 60%),
+              radial-gradient(circle at 80% 70%, rgba(59, 130, 246, 0.2) 0%, transparent 60%),
+              radial-gradient(circle at 40% 80%, rgba(168, 85, 247, 0.2) 0%, transparent 60%),
+              radial-gradient(circle at 90% 20%, rgba(34, 197, 94, 0.2) 0%, transparent 60%),
+              radial-gradient(circle at 60% 40%, rgba(251, 146, 60, 0.15) 0%, transparent 60%)
+            `,
+          }}
+          animate={{
+            background: [
+              `radial-gradient(circle at 20% 30%, rgba(var(--primary), 0.2) 0%, transparent 60%),
+               radial-gradient(circle at 80% 70%, rgba(59, 130, 246, 0.2) 0%, transparent 60%),
+               radial-gradient(circle at 40% 80%, rgba(168, 85, 247, 0.2) 0%, transparent 60%),
+               radial-gradient(circle at 90% 20%, rgba(34, 197, 94, 0.2) 0%, transparent 60%),
+               radial-gradient(circle at 60% 40%, rgba(251, 146, 60, 0.15) 0%, transparent 60%)`,
+              `radial-gradient(circle at 80% 20%, rgba(var(--primary), 0.2) 0%, transparent 60%),
+               radial-gradient(circle at 20% 80%, rgba(59, 130, 246, 0.2) 0%, transparent 60%),
+               radial-gradient(circle at 70% 30%, rgba(168, 85, 247, 0.2) 0%, transparent 60%),
+               radial-gradient(circle at 30% 70%, rgba(34, 197, 94, 0.2) 0%, transparent 60%),
+               radial-gradient(circle at 50% 60%, rgba(251, 146, 60, 0.15) 0%, transparent 60%)`,
+              `radial-gradient(circle at 20% 30%, rgba(var(--primary), 0.2) 0%, transparent 60%),
+               radial-gradient(circle at 80% 70%, rgba(59, 130, 246, 0.2) 0%, transparent 60%),
+               radial-gradient(circle at 40% 80%, rgba(168, 85, 247, 0.2) 0%, transparent 60%),
+               radial-gradient(circle at 90% 20%, rgba(34, 197, 94, 0.2) 0%, transparent 60%),
+               radial-gradient(circle at 60% 40%, rgba(251, 146, 60, 0.15) 0%, transparent 60%)`,
+            ],
+          }}
+          transition={{
+            duration: 12,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+        />
+
+        {/* Enhanced Grid Background */}
+        <GridBackground />
+
+        {/* Morphing Blobs */}
+        {mounted &&
+          Array.from({ length: 8 }).map((_, index) => (
+            <MorphingBlob key={`blob-${index}`} index={index} />
+          ))}
+
+        {/* Light Rays */}
+        {mounted &&
+          Array.from({ length: 12 }).map((_, index) => (
+            <LightRay
+              key={`ray-${index}`}
+              angle={index * 30}
+              delay={index * 0.5}
+            />
+          ))}
+
+        {/* Advanced Floating 3D Shapes */}
+        {mounted &&
+          floatingShapes.map((shape, index) => (
+            <FloatingShape key={`shape-${index}`} {...shape} />
+          ))}
+
+        {/* Neural Network Particles */}
+        {mounted &&
+          Array.from({ length: 20 }).map((_, index) => (
+            <NeuralParticle
+              key={`neural-${index}`}
+              index={index}
+              particles={neuralParticles}
+            />
+          ))}
+
+        {/* Enhanced Floating Particles */}
+        {mounted &&
+          Array.from({ length: 50 }).map((_, index) => (
+            <Particle key={`particle-${index}`} />
+          ))}
+
+        {/* Additional Depth Effect */}
+        <motion.div
+          className="absolute inset-0 pointer-events-none bg-gradient-to-br from-primary/8 via-transparent to-blue-500/8"
+          animate={{
+            opacity: [0.3, 0.7, 0.4, 0.8, 0.3],
+          }}
+          transition={{
+            duration: 10,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+        />
       </div>
 
-      <div className="container-custom section-padding text-center">
+      <div className="container-custom section-padding text-center relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
